@@ -29,13 +29,16 @@
 ;; Emacs 24 introduced lexical scope for variables to Emacs
 ;; Lisp. However, rather than provide it via a new form, say llet or
 ;; whatever, the buffer local variable `lexical-binding' was
-;; introduced to switch the behaviour of `let' forms. This is an
+;; introduced to switch the behaviour of binding forms. This is an
 ;; unfortunate situation because the semantics of a piece of code
-;; depends on the value of a buffer local variable at the time of
+;; depend on the value of a buffer local variable at the time of
 ;; evaluation.
 
 ;; This minor mode is intended to make it plain what the value of
 ;; `lexical-binding' is in the buffers used to evaluate lisp forms.
+;; It does this by adding the string "(LEX)" to indicate lexical
+;; binding is enabled, and "(DYN)" to indicate that lexical binding
+;; is disabled and that dynamic binding is in effect.
 
 ;; To install, once lexbind-mode.el is located somewhere in your
 ;; load-path, you can add this to your initialization file:
