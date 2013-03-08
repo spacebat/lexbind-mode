@@ -1,0 +1,6 @@
+* Lexbind Minor Mode
+This is lexbind-mode, an Emacs minor mode to display the value of
+the lexical-binding variable which determines the behaviour of
+variable binding forms in Emacs Lisp.
+
+See lexbind-mode.el for installation instructions.
