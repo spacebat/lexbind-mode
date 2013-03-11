@@ -7,7 +7,7 @@
 ;; URL:        https://github.com/spacebat/lexbind-mode
 ;; Created:    08 Mar 2013
 ;; Keywords:   convenience, lisp
-;; Version:    0.4
+;; Version:    0.5
 
 ;; This file is not part of GNU Emacs.
 
@@ -52,6 +52,7 @@
 (eval-when-compile
   (require 'cl))
 
+;;;###autoload
 (defun lexbind-toggle-lexical-binding (&optional arg)
   "Toggle the variable `lexical-binding' on and off.  Interactive.
 When called with a numeric argument, set `lexical-binding' to t
@@ -63,6 +64,7 @@ enables it, non-positive disables it."
                             (plusp (prefix-numeric-value arg))
                           (not lexical-binding))))
 
+;;;###autoload
 (defun lexbind-modeline-content (&rest args)
   "Generate mode line content to indicate the value of `lexical-binding'.
 Optional argument ARGS if provided, the first argument is taken as the value
@@ -84,6 +86,7 @@ of `lexical-binding'."
         'help-echo (format pattern "disabled"))))))
 
 
+;;;###autoload
 (define-minor-mode lexbind-mode
   "Toggle Lexbind mode.
 Interactively with no argument, this command toggles the mode.
