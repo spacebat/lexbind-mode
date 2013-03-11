@@ -1,7 +1,7 @@
-;;; lexbind-mode.el --- Puts the value of lexical-binding in the mode line ;; lexical-binding: t;
-     
+;;; lexbind-mode.el --- Puts the value of lexical-binding in the mode line ;; -*- lexical-binding: t; -*-
+
 ;; Copyright (C) 2013 Andrew Kirkpatrick
-     
+
 ;; Author:     Andrew Kirkpatrick <ubermonk@gmail.com>
 ;; Maintainer: Andrew Kirkpatrick <ubermonk@gmail.com>
 ;; Created:    08 Mar 2013
@@ -9,7 +9,7 @@
 ;; Version:    0.2
 
 ;; This file is not part of GNU Emacs.
-     
+
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation, either version 3 of the License, or
@@ -27,18 +27,18 @@
 ;;; Commentary:
 
 ;; Emacs 24 introduced lexical scope for variables to Emacs
-;; Lisp. However, rather than provide it via a new form, say llet or
+;; Lisp.  However, rather than provide it via a new form, say llet or
 ;; whatever, the buffer local variable `lexical-binding' was
-;; introduced to switch the behaviour of binding forms. This is an
+;; introduced to switch the behaviour of binding forms.  This is an
 ;; unfortunate situation because the semantics of a piece of code
 ;; depend on the value of a buffer local variable at the time of
 ;; evaluation.
 
 ;; This minor mode is intended to make it plain what the value of
-;; `lexical-binding' is in the buffers used to evaluate lisp forms.
-;; It does this by adding the string "(LEX)" to indicate lexical
-;; binding is enabled, and "(DYN)" to indicate that lexical binding
-;; is disabled and that dynamic binding is in effect.
+;; `lexical-binding' is in the buffers used to evaluate Lisp forms.
+;; It does this by adding to the mode line the string "(LEX)" to
+;; indicate lexical binding is enabled, and "(DYN)" to indicate that
+;; lexical binding is disabled and that dynamic binding is in effect.
 
 ;; To install, once lexbind-mode.el is located somewhere in your
 ;; load-path, you can add this to your initialization file:
@@ -52,21 +52,26 @@
   (require 'cl))
 
 (defun lexbind-toggle-lexical-binding (&optional arg)
-  "Toggle the variable lexical-binding on and off. Interactive.
-When called with a numeric argument, set lexical-binding to t
-if the argument is positive, nil otherwise."
+  "Toggle the variable `lexical-binding' on and off.  Interactive.
+When called with a numeric argument, set `lexical-binding' to t
+if the argument is positive, nil otherwise.
+Optional argument ARG if nil toggles `lexical-binding', positive
+enables it, non-positive disables it."
   (interactive)
   (setq lexical-binding (if arg
                             (plusp (prefix-numeric-value arg))
                           (not lexical-binding))))
 
 (defun lexbind-modeline-content (&rest args)
+  "Generate mode line content to indicate the value of `lexical-binding'.
+Optional argument ARGS if provided, the first argument is taken as the value
+of `lexical-binding'."
   (let ((lexbind-p (if (plusp (length args))
                        (car args)
                      lexical-binding))
-        
+
         (pattern "Emacs Lisp lexical-binding is %s"))
-    
+
     (concat
      " "
      (if lexbind-p
@@ -90,8 +95,8 @@ contain the string (LEX) for lexical binding, (DYN) for dynamic
 binding, to indicate the state of the lexical-binding variable in
 that buffer."
 
-      :init-value nil  
-      :lighter ""
+      :init-value nil
+      :lighter ""   ; unable to change lighter on a per-buffer basis
       :keymap '(((kbd "C-cM-l") . lexbind-toggle-lexical-binding))
       :group 'lexbind
       :after-hook (progn
