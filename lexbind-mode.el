@@ -102,7 +102,7 @@ that buffer."
                                       mode-line-format)
                            '((lexbind-mode
                               (:eval (lexbind-modeline-content))))
-                           mode-line-end-spaces))
+                           'mode-line-end-spaces))
                     (force-mode-line-update)))
 
 
