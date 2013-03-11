@@ -6,7 +6,7 @@
 ;; Maintainer: Andrew Kirkpatrick <ubermonk@gmail.com>
 ;; Created:    08 Mar 2013
 ;; Keywords:   convenience, lisp
-;; Version:    0.2
+;; Version:    0.3
 
 ;; This file is not part of GNU Emacs.
 
