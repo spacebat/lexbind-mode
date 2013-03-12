@@ -1,4 +1,4 @@
-;;; lexbind-mode.el --- Puts the value of lexical-binding in the mode line ;; -*- lexical-binding: t; -*-
+;;; lexbind-mode.el --- Puts the value of lexical-binding in the mode line
 
 ;; Copyright (C) 2013 Andrew Kirkpatrick
 
@@ -48,6 +48,10 @@
 ;; (add-hook 'emacs-lisp-mode-hook 'lexbind-mode)
 
 ;;; Code:
+
+;; Local Variables:
+;; lexical-binding: t
+;; End:
 
 (eval-when-compile
   (require 'cl))
