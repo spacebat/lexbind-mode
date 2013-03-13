@@ -7,7 +7,7 @@
 ;; URL:        https://github.com/spacebat/lexbind-mode
 ;; Created:    08 Mar 2013
 ;; Keywords:   convenience, lisp
-;; Version:    0.5
+;; Version:    0.6
 
 ;; This file is not part of GNU Emacs.
 
@@ -105,7 +105,7 @@ that buffer."
 
       :init-value nil
       :lighter ""   ; unable to change lighter on a per-buffer basis
-      :keymap '(((kbd "C-cM-l") . lexbind-toggle-lexical-binding))
+      :keymap `((,(kbd "C-c M-l") . lexbind-toggle-lexical-binding))
       :group 'lexbind
       :after-hook (progn
                     (setq mode-line-format
