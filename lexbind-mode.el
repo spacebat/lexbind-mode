@@ -7,7 +7,7 @@
 ;; URL:        https://github.com/spacebat/lexbind-mode
 ;; Created:    08 Mar 2013
 ;; Keywords:   convenience, lisp
-;; Version:    0.6
+;; Version:    0.7
 
 ;; This file is not part of GNU Emacs.
 
@@ -56,6 +56,12 @@
 (eval-when-compile
   (require 'cl))
 
+(defvar lexbind-mode-keymap
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-c M-l") 'lexbind-toggle-lexical-binding)
+    map)
+  "Keymap for lexbind minor mode")
+
 ;;;###autoload
 (defun lexbind-toggle-lexical-binding (&optional arg)
   "Toggle the variable `lexical-binding' on and off.  Interactive.
@@ -64,9 +70,13 @@ if the argument is positive, nil otherwise.
 Optional argument ARG if nil toggles `lexical-binding', positive
 enables it, non-positive disables it."
   (interactive)
-  (setq lexical-binding (if arg
-                            (plusp (prefix-numeric-value arg))
-                          (not lexical-binding))))
+  (let ((state (if arg
+                   (plusp (prefix-numeric-value arg))
+                 (not lexical-binding))))
+    (setq lexical-binding state)
+    (when (called-interactively-p 'any)
+      (message "Lexical-binding %s" (if lexical-binding "enabled" "disabled")))
+    state))
 
 ;;;###autoload
 (defun lexbind-modeline-content (&rest args)
@@ -104,20 +114,21 @@ binding, to indicate the state of the lexical-binding variable in
 that buffer."
 
       :init-value nil
-      :lighter ""   ; unable to change lighter on a per-buffer basis
-      :keymap `((,(kbd "C-c M-l") . lexbind-toggle-lexical-binding))
-      :group 'lexbind
-      :after-hook (progn
-                    (setq mode-line-format
-                          (append
-                           (remove-if (lambda (x)
-                                        (eq x 'mode-line-end-spaces))
-                                      mode-line-format)
-                           '((lexbind-mode
-                              (:eval (lexbind-modeline-content))))
-                           'mode-line-end-spaces))
-                    (force-mode-line-update)))
+      :lighter (:eval (lexbind-modeline-content))
+      :keymap lexbind-mode-keymap
+      ;; TODO: there is nothing configurable yet - what to configure?
+      :group 'lexbind)
 
+(easy-menu-define lexbind-mode-menu
+  lexbind-mode-keymap
+  "lexbind-mode"
+  '("Lexbind"
+    ["Toggle lexical-binding" (call-interactively
+                               'lexbind-toggle-lexical-binding)]
+    ["Turn Off minor mode" (progn
+                             (lexbind-mode -1)
+                             (message "Lexbind mode disabled"))]
+    ["Help for minor mode" (describe-function 'lexbind-mode)]))
 
 (provide 'lexbind-mode)
 
