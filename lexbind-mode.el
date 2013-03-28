@@ -7,7 +7,7 @@
 ;; URL:        https://github.com/spacebat/lexbind-mode
 ;; Created:    08 Mar 2013
 ;; Keywords:   convenience, lisp
-;; Version:    0.7
+;; Version:    0.8
 
 ;; This file is not part of GNU Emacs.
 
@@ -41,6 +41,9 @@
 ;; indicate lexical binding is enabled, and "(DYN)" to indicate that
 ;; lexical binding is disabled and that dynamic binding is in effect.
 
+;; Other lexical scope specific utilities such as lexbind-lexscratch
+;; may also find a home here.
+
 ;; To install, once lexbind-mode.el is located somewhere in your
 ;; load-path, you can add this to your initialization file:
 
@@ -59,6 +62,7 @@
 (defvar lexbind-mode-keymap
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-c M-l") 'lexbind-toggle-lexical-binding)
+    (define-key map (kbd "C-c M-s") 'lexbind-lexscratch)
     map)
   "Keymap for lexbind minor mode")
 
@@ -77,6 +81,23 @@ enables it, non-positive disables it."
     (when (called-interactively-p 'any)
       (message "Lexical-binding %s" (if lexical-binding "enabled" "disabled")))
     state))
+
+;; lexbind-lexscratch is here because I'm not aware of a better
+;; package for it to live in, its useful and its small.
+;;;###autoload
+(defun lexbind-lexscratch (&optional other-window)
+  "Make a lexical scratch buffer."
+  (interactive "P")
+  (let ((buf (get-buffer "*lexscratch*")))
+    (unless buf
+      (setq buf (get-buffer-create "*lexscratch*"))
+      (with-current-buffer buf
+        (lisp-interaction-mode)
+        (setq lexical-binding t)
+        (insert initial-scratch-message)))
+    (if other-window
+        (switch-to-buffer-other-window buf)
+      (switch-to-buffer buf))))
 
 ;;;###autoload
 (defun lexbind-modeline-content (&rest args)
@@ -125,6 +146,8 @@ that buffer."
   '("Lexbind"
     ["Toggle lexical-binding" (call-interactively
                                'lexbind-toggle-lexical-binding)]
+    ["Lexical scratch buffer" (call-interactively
+                               'lexbind-lexscratch)]
     ["Turn Off minor mode" (progn
                              (lexbind-mode -1)
                              (message "Lexbind mode disabled"))]
