@@ -7,7 +7,7 @@
 ;; URL:        https://github.com/spacebat/lexbind-mode
 ;; Created:    08 Mar 2013
 ;; Keywords:   convenience, lisp
-;; Version:    0.8
+;; Version:    0.9
 
 ;; This file is not part of GNU Emacs.
 
