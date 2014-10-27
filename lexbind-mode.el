@@ -57,6 +57,7 @@
 
 (defvar lexbind-mode-keymap
   (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-c M-t") 'lexbind-insert-lexical-binding-t)
     (define-key map (kbd "C-c M-l") 'lexbind-toggle-lexical-binding)
     (define-key map (kbd "C-c M-s") 'lexbind-lexscratch)
     map)
@@ -95,6 +96,59 @@ enables it, non-positive disables it."
         (switch-to-buffer-other-window buf)
       (switch-to-buffer buf))))
 
+;; TODO: test in an empty file
+(defmacro lexbind-with-first-line (&rest body)
+  "Narrow to the first line."
+  `(save-excursion
+     (save-restriction
+       (widen)
+       (goto-char 1)
+       (forward-line 1)
+       (narrow-to-region 1 (point))
+       (goto-char (point-min))
+       ,@body)))
+
+(defun lexbind-prop-line-p ()
+  "Indicate if the first line of the current buffer is a prop-line."
+  (lexbind-with-first-line
+   (re-search-forward "-\\*-.+-\\*-" nil t)))
+
+;;;###autoload
+(defun lexbind-insert-lexical-binding-t (&optional verbose)
+  "Attempt to set `lexical-binding' to t in the current buffer's
+prop-line."
+  (interactive)
+  (cl-flet ((mesg (&rest args)
+                  (when verbose
+                    (apply 'message args))))
+    (if (lexbind-prop-line-p)
+        (let* ((vars (hack-local-variables-prop-line))
+               (lexbound (assoc 'lexical-binding vars)))
+          (mesg "prop-line found")
+          (if vars
+              (if lexbound
+                  (if (not (cdr lexbound))
+                      (progn
+                        (mesg "need to substitute prop-line")
+                        (lexbind-with-first-line
+                         (when (re-search-forward "\\blexical-binding: *nil\\b" nil t)
+                           (replace-match "lexical-binding: t" nil nil)
+                           t)))
+                    (message "lexical-binding is already non-nil"))
+                (mesg "need to append lexical-binding: t")
+                (lexbind-with-first-line
+                 (when (re-search-forward "\\(-\\*- +\\)\\(.*?\\)\\(;*\\)\\( +-\\*-\\)" nil t)
+                   (replace-match (if (plusp (length (match-string 2))) "; " "") nil nil nil 3)
+                   (replace-match "lexical-binding: t\\4" nil nil nil 4))))
+            (message "Malformed prop line")))
+      (mesg "no prop-line found")
+      (save-excursion
+        (goto-char 1)
+        (insert "-*- lexical-binding: t -*-\n")
+        (set-mark (point))
+        (goto-char 1)
+        (comment-region (point) (mark))))))
+
 ;;;###autoload
 (defun lexbind-modeline-content (&rest args)
   "Generate mode line content to indicate the value of `lexical-binding'.
@@ -130,16 +184,18 @@ contain the string (LEX) for lexical binding, (DYN) for dynamic
 binding, to indicate the state of the lexical-binding variable in
 that buffer."
 
-      :init-value nil
-      :lighter (:eval (lexbind-modeline-content))
-      :keymap lexbind-mode-keymap
-      ;; TODO: there is nothing configurable yet - what to configure?
-      :group 'lexbind)
+  :init-value nil
+  :lighter (:eval (lexbind-modeline-content))
+  :keymap lexbind-mode-keymap
+  ;; TODO: there is nothing configurable yet - what to configure?
+  :group 'lexbind)
 
 (easy-menu-define lexbind-mode-menu
   lexbind-mode-keymap
   "lexbind-mode"
   '("Lexbind"
+    ["Insert lexical-binding local var" (call-interactively
+                                         'lexbind-insert-lexical-binding-t)]
     ["Toggle lexical-binding" (call-interactively
                                'lexbind-toggle-lexical-binding)]
     ["Lexical scratch buffer" (call-interactively
